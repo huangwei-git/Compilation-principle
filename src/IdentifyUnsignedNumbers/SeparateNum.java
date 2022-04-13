@@ -7,10 +7,24 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class SeparateNum extends Separate {
-    private HashSet<String> opSymbol = new HashSet<String>(){{
+    private HashMap<String,String> mask = new HashMap<>();
+
+    private HashSet<String> opSymbols = new HashSet<String>(){{
         add("+");add("-");add("*");add("/");add("%");
-    }
-    };
+    }};
+
+    private HashSet<String> exponents = new HashSet<String>(){{
+       add("E");add("e");
+    }};
+    private HashSet<String> plusAndMinus = new HashSet<String>(){{
+       add("+");add("-");
+    }};
+    private HashSet<String> dots = new HashSet<String>(){{
+        add(".");
+    }};
+    private HashSet<String> digits = new HashSet<String>(){{
+        add("0");add("1");add("2");add("3");add("4");add("5");add("6");add("7");add("8");add("9");
+    }};
 
     @Override
     public HashMap<String, HashSet<String>> work(String filePath) {
@@ -24,6 +38,7 @@ public class SeparateNum extends Separate {
         while(!isOutOfBounds()){
             Type type =  separateWord();
             if(type != null){
+                maskOff(type);
                 if(!map.containsKey(type.sign)){
                     System.out.println(type.sign + " " + type.value);
                     map.put(type.sign,new HashSet<>(){{add(type.value);}});
@@ -49,9 +64,6 @@ public class SeparateNum extends Separate {
             c = getChar();
         }
 
-//        if(opSymbol.contains("" + c)){
-//            return new Type("其他","" + c);
-//        }
         /*第一个字符非数字：*/
         if(!isDigit(c)){
             readNotOpSymbol(c,store);
@@ -63,12 +75,12 @@ public class SeparateNum extends Separate {
             c = readNumber(c,store);
             //数字之后是运算符
             if(c == '\0') return new Type("数字", store.toString());
-            if(opSymbol.contains("" + c)){
+            if(opSymbols.contains("" + c)){
                 retract();
                 return new Type("数字",store.toString());
             }
             // 小数点
-            else if(c == '.'){
+            else if(isDot(c)){
                 store.append(c);
                 if(isOutOfBounds()) return new Type("异常",store.toString());
                 c = getChar();
@@ -76,11 +88,11 @@ public class SeparateNum extends Separate {
                 if(isDigit(c)){
                     c = readNumber(c,store);
                     if(c == '\0') return new Type("数字",store.toString());
-                    else if(c == 'E' || c == 'e'){
+                    else if(isExponents(c)){
                         store.append(c);
                         if(isOutOfBounds()) return new Type("异常",store.toString());
                         c = getChar();
-                        if(c == '+' || c == '-'){
+                        if(isAddOrSubtract(c)){
                             store.append(c);
                             if(isOutOfBounds()) return new Type("异常",store.toString());
                             c = getChar();
@@ -91,7 +103,7 @@ public class SeparateNum extends Separate {
                             else {// E+数字
                                 c = readNumber(c,store);
                                 if(c == '\0') return new Type("数字",store.toString());
-                                if(opSymbol.contains("" + c)){
+                                if(opSymbols.contains("" + c)){
                                     retract();
                                     return new Type("数字",store.toString());
                                 }
@@ -106,7 +118,7 @@ public class SeparateNum extends Separate {
                             return new Type("异常",store.toString());
                         }
                     }
-                    else if(opSymbol.contains("" + c)){
+                    else if(opSymbols.contains("" + c)){
                         retract();
                         return new Type("数字",store.toString());
                     }
@@ -122,11 +134,11 @@ public class SeparateNum extends Separate {
                 }
             }
             //数字之后是‘E’或‘e’
-            else if(c == 'E' || c == 'e'){
+            else if(isExponents(c)){
                 store.append(c);
                 if(isOutOfBounds()) return new Type("异常",store.toString());
                 c = getChar();
-                if(c == '+' || c == '-'){
+                if(isAddOrSubtract(c)){
                     store.append(c);
                     if(isOutOfBounds()) return new Type("异常",store.toString());
                     c = getChar();
@@ -137,7 +149,7 @@ public class SeparateNum extends Separate {
                     else {// E+数字
                         c = readNumber(c,store);
                         if(c == '\0') return new Type("数字",store.toString());
-                        if(opSymbol.contains("" + c)){
+                        if(opSymbols.contains("" + c)){
                             retract();
                             return new Type("数字",store.toString());
                         }
@@ -156,13 +168,11 @@ public class SeparateNum extends Separate {
         return res;
     }
 
-
-
     // 循环读取数字，返回第一个遇到的非数字；若返回为'\0'，则文本内容读完
     public char readNumber(char c,StringBuilder store){
         while(isDigit(c)){
-            if(isOutOfBounds()) return '\0';
             store.append(c);
+            if(isOutOfBounds()) return '\0';
             c = getChar();
         }
         return c;
@@ -177,5 +187,70 @@ public class SeparateNum extends Separate {
         }
         retract();
         return ;
+    }
+
+    @Override
+    public boolean isDigit(char c) {
+        if(digits.contains("" + c)) return true;
+        else return false;
+    }
+
+    public boolean isOperator(char c){
+        if(opSymbols.contains("" + c)) return true;
+        else return false;
+    }
+
+    public boolean isExponents(char c){
+        if(exponents.contains("" + c)) return true;
+        else return false;
+    }
+
+    public boolean isDot(char c){
+        if(dots.contains("" + c)) return true;
+        else return false;
+    }
+
+    public boolean isAddOrSubtract(char c){
+        if(plusAndMinus.contains("" + c)) return true;
+        else return false;
+    }
+
+    public void setOpSymbols(HashSet<String> opSymbols,int mode) {
+        if(mode == 0) this.opSymbols = opSymbols;
+        else this.opSymbols.addAll(opSymbols);
+    }
+
+    public void setExponents(HashSet<String> exponents,int mode) {
+        if(mode == 0) this.exponents = exponents;
+        else this.exponents.addAll(exponents);
+    }
+
+    public void setDot(HashSet<String> dots,int mode) {
+        if(mode == 0) this.dots = dots;
+        else this.dots.addAll(dots);
+    }
+
+    public void setDigits(HashSet<String> digits,int mode) {
+        if(mode == 0) this.digits = digits;
+        else this.digits.addAll(digits);
+    }
+
+    public void setPlusAndMinus(HashSet<String> plusAndMinus,int mode) {
+        if(mode == 0) this.plusAndMinus = plusAndMinus;
+        else this.plusAndMinus.addAll(plusAndMinus);
+    }
+
+    public void setMask(HashMap<String, String> mask) {
+        this.mask.putAll(mask);
+    }
+
+    public void maskOff(Type type){
+        StringBuilder newVlue = new StringBuilder();
+        for(int i = 0;i < type.value.length();i++){
+            String tmp = type.value.substring(i,i + 1);
+            if(mask.containsKey(tmp)) newVlue.append(mask.get(tmp));
+            else newVlue.append(tmp);
+        }
+        type.value = newVlue.toString();
     }
 }
