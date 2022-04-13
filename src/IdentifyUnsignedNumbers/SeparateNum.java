@@ -1,4 +1,4 @@
-package test;
+package IdentifyUnsignedNumbers;
 
 import LexicalAnalysis.Separate;
 import LexicalAnalysis.Type;

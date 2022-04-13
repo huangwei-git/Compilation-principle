@@ -1,9 +1,8 @@
-package test;
+package IdentifyUnsignedNumbers;
 
 import LexicalAnalysis.Analysis;
-import LexicalAnalysis.Separate;
 
-public class IdentifyUnsignedNumbers extends Analysis {
+public class NumberAnalysis extends Analysis {
     @Override
     public void loadWords(String filePath) {
         SeparateNum separateNum = new SeparateNum();
