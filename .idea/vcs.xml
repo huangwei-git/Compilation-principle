@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Compilation-principle-GrammarCategory" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/EAN-13/Drawing-EAN-13-barcode-using-java-GUI" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/GrammarCategory" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/LexicalAnalysis" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/StopWords" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/StopWords/StopWords" vcs="Git" />
+  </component>
+</project>
