@@ -8,20 +8,66 @@ public class Thompson {
 
     public Thompson(String normalExpression){
         tree = new BuildTree().getTree(normalExpression);
+        nfa = BuildNFA(tree);
+        System.out.println(nfa);
     }
 
-    public void BuildNFA(Node root){
+    public NFA BuildNFA(Node root){
+        NFA res = null;
         if(root != null){
-           BuildNFA(root.rchild);
-           BuildNFA(root.lchild);
+            NFA rightNFA = BuildNFA(root.rchild);
+            NFA leftNFA = BuildNFA(root.lchild);
+            if(rightNFA == null) res = new NFA(root.value);
+            else res = calc(root.value,rightNFA,leftNFA);
         }
+        return res;
     }
 
-    private void AND(NFA nfa1,NFA nfa2){
-        nfa1.merge(nfa2);
+    private NFA calc(String operator,NFA nfa2,NFA nfa1){
+        NFA res = null;
+        if(operator.equals("|")){
+            res = OR(nfa2,nfa1);
+        }else if(operator.equals("·")){
+            res = AND(nfa2,nfa1);
+        }else if(operator.equals("*")){
+            res = klinClosure(nfa2,nfa1);
+        }else if(operator.equals("+")){
+            res = positiveClosure(nfa2,nfa1);
+        }
+        return res;
     }
 
-    private void OR(NFA nfa1,NFA nfa2){
+    private NFA AND(NFA nfa2,NFA nfa1){
+        nfa2.merge(nfa1);
+        nfa2.connectToeToHead(nfa1);
+        return nfa2;
+    }
 
+    private NFA OR(NFA nfa2,NFA nfa1){
+        nfa2.addToHead();
+        String recordToe = nfa2.getToe();
+        nfa2.merge(nfa1);
+        nfa2.addToToe();
+        nfa2.connectHeadToHead(nfa1);
+        nfa2.addTransfer(new Pair(recordToe,"ε"),nfa2.getToe());
+        return nfa2;
+    }
+
+
+    private NFA positiveClosure(NFA nfa,NFA nfaNULL){
+        nfa.connectToeToHead();
+        nfa.addToHead();
+        nfa.addToToe();
+        return nfa;
+    }
+
+    private NFA klinClosure(NFA nfa,NFA nfaNULL){
+        nfa = positiveClosure(nfa,null);
+        nfa.connectHeadToToe();
+        return nfa;
+    }
+
+    public static void main(String[] args) {
+        new Thompson("a|b");
     }
 }

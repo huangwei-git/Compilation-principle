@@ -1,27 +1,24 @@
 package ThompsonBuildNFA;
 
 public class Pair implements Comparable<Pair>{
-    private String start;
+    private String head;
     private String input;
 
-    public Pair() {
-    }
-
     public Pair(String start, String input) {
-        this.start = start;
+        this.head = start;
         this.input = input;
     }
 
-    public void setStart(String start) {
-        this.start = start;
+    public void setHead(String head) {
+        this.head = head;
     }
 
     public void setInput(String input) {
         this.input = input;
     }
 
-    public String getStart() {
-        return start;
+    public String getHead() {
+        return head;
     }
 
     public String getInput() {
@@ -29,18 +26,8 @@ public class Pair implements Comparable<Pair>{
     }
 
     @Override
-    public boolean equals(Object obj) {
-        boolean res = false;
-        if(obj instanceof Pair){
-            Pair pair = (Pair)obj;
-            if(start == pair.start && input.equals(pair.input)) return true;
-        }
-        return res;
-    }
-
-    @Override
     public int compareTo(Pair o) {
-        int compare = getStart().compareTo(o.getStart());
+        int compare = getHead().compareTo(o.getHead());
         if(compare == 0){
             compare = getInput().compareTo(o.getInput());
         }
