@@ -1,5 +1,7 @@
-import Thompson.BuildTree;
-import Thompson.Node;
+import ThompsonBuildNFA.BuildTree;
+import ThompsonBuildNFA.Node;
+
+import java.util.HashMap;
 
 public class Run{
     public static void main(String[] args) {
@@ -7,4 +9,9 @@ public class Run{
         Node node = buildTree.getTree("((0*|1)(1*0))*");
         buildTree.inOrderTraversal(node,0);
     }
+}
+
+class nd{
+    String state;
+    HashMap<String,nd> map;
 }

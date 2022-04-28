@@ -1,4 +1,4 @@
-package Thompson;
+package ThompsonBuildNFA;
 /*
 运算符优先级
 () [] ^* ^+ · |

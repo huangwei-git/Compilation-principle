@@ -1,4 +1,4 @@
-package Thompson;
+package ThompsonBuildNFA;
 
 //树结点类
 public class Node{
