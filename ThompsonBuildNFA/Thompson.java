@@ -9,7 +9,6 @@ public class Thompson {
     public Thompson(String normalExpression){
         tree = new BuildTree().getTree(normalExpression);
         nfa = BuildNFA(tree);
-        System.out.println(nfa);
     }
 
     public NFA BuildNFA(Node root){
@@ -38,8 +37,8 @@ public class Thompson {
     }
 
     private NFA AND(NFA nfa2,NFA nfa1){
-        nfa2.merge(nfa1);
-        nfa2.connectToeToHead(nfa1);
+        String res = nfa2.merge(nfa1);
+        nfa2.connectToeToHead(res,nfa1);
         return nfa2;
     }
 
@@ -67,7 +66,7 @@ public class Thompson {
         return nfa;
     }
 
-    public static void main(String[] args) {
-        new Thompson("a|b");
+    public NFA getNfa() {
+        return nfa;
     }
 }

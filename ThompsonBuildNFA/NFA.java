@@ -28,14 +28,15 @@ public class NFA {
     }
 
     //合并NFA
-    public void merge(NFA nfa){
+    public String merge(NFA nfa){
+        String res = toe;
         int bias = SToV(toe);
-        System.out.println(bias);
         nfa.shift(bias);
         transfer.putAll(nfa.getTransfer());
         vn.addAll(nfa.vn);
         vt.addAll(nfa.vt);
         toe = nfa.toe;
+        return res;
     }
 
     // 本的NFA的头部连接所传入NFA的头部
@@ -51,7 +52,7 @@ public class NFA {
     }
 
     // 本NFA的尾部连接本NFA的头部
-    public void connectToeToHead(NFA nfa){
+    public void connectToeToHead(String toe,NFA nfa){
         addTransfer(new Pair(toe,"ε"),nfa.head);
         vt.add("ε");
     }

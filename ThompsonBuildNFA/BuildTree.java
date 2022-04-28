@@ -12,7 +12,8 @@ import java.util.TreeMap;
 public class BuildTree {
     // 操作符优先级映射
     private TreeMap<String,Integer> operatorPriorityMap = new TreeMap<>(){{
-        put("*",3);
+        put("*",4);
+        put("+",3);
         put("·",2);
         put("|",1);
         put("\0",-1);
@@ -66,6 +67,7 @@ public class BuildTree {
                 lastIsOperator = true;
                 //操作符入栈
                 if(operatorPriorityMap.get(nextSymbol) > operatorPriorityMap.get(operatorStack.peek())){
+                    if(unaryOperators.contains(nextSymbol)) lastIsOperator = false;
                     operatorStack.add(nextSymbol);
                 }
                 //计算栈内数字后入栈
@@ -110,12 +112,12 @@ public class BuildTree {
     }
 
     // 中序遍历
-    public void inOrderTraversal(Node node, int height){
+    public void inOrderTraversal(Node node){
         if(node != null){
             if(node.brackets == 1) System.out.print("(");
-            inOrderTraversal(node.rchild,height + 1);
+            inOrderTraversal(node.rchild);
             if(!node.value.equals("·")) System.out.print(node.value);
-            inOrderTraversal(node.lchild,height + 1);
+            inOrderTraversal(node.lchild);
             if (node.brackets == 1) System.out.print(")");
         }
     }
