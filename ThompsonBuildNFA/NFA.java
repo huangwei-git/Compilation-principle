@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.util.*;
 
 public class NFA {
-    private String head;
-    private String toe;
+    private String head;// 开始
+    private String toe;// 结束
+    // 状态转移方程
+    private TreeMap<Pair,TreeSet<String>> transfer = new TreeMap<>();
     private TreeSet<String> vn = new TreeSet<>();
     private TreeSet<String> vt = new TreeSet<>();
-    private TreeMap<Pair,TreeSet<String>> transfer = new TreeMap<>();
 
 /*构造函数*/
     public NFA(String input){

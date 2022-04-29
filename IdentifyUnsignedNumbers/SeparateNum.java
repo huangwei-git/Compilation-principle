@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -17,10 +18,6 @@ public class SeparateNum extends Separate {
         put("A","0");put("B","1");put("C","2");put("D","3");put("E","4");put("F","5");
         put("G","6");put("H","7");put("I","8");put("J","9");put("K",".");put("L","E");
 
-    }};
-    private HashMap<String,String> maskOn = new HashMap<>(){{
-        put("0","A");put("1","B");put("2","C");put("3","D");put("4","E");put("5","F");
-        put("6","G");put("7","H");put("8","I");put("9","J");put(".","K");put("E","L");
     }};
 
     @Override
@@ -71,19 +68,20 @@ public class SeparateNum extends Separate {
             Type type =  separateWord();
             if(type != null){
                 String value = type.value;
-                if (isMask) {
-                    if(!type.sign.equals("数字")) continue;
+                if(type.sign.equals("数字")){
                     int index = value.indexOf("E") + value.indexOf("e");
                     if(index != -2){
                         index++;
-                        int F = Integer.parseInt(value.substring(0,index));
-                        index+=2;
-                        int E = (int) Math.pow(10,Integer.parseInt(value.substring(index)));
-                        value = "" + (F*E);
+                        String F = value.substring(0,index);
+                        index++;
+                        String E = "" + Math.pow(10,Integer.parseInt(value.substring(index)));
+                        value = new BigDecimal(F).multiply(new BigDecimal(E)).toString();
                     }
+                }else if(isMask){
+                    continue;
                 }
                 if(!map.containsKey(type.sign)){
-                    System.out.println(type.sign + " " + type.value);
+                    System.out.println(type.sign + ":" + type.value);
                     String finalValue = value;
                     map.put(type.sign,new HashSet<>(){{add(finalValue);}});
                 }
