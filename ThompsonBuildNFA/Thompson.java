@@ -15,9 +15,12 @@ public class Thompson {
         NFA res = null;
         if(root != null){
             NFA rightNFA = BuildNFA(root.rchild);
-            NFA leftNFA = BuildNFA(root.lchild);
+            NFA leftNFA = null;
+            leftNFA = BuildNFA(root.lchild);
             if(rightNFA == null) res = new NFA(root.value);
-            else res = calc(root.value,rightNFA,leftNFA);
+            else{
+                res = calc(root.value,rightNFA,leftNFA);
+            }
         }
         return res;
     }
@@ -61,7 +64,7 @@ public class Thompson {
     }
 
     private NFA klinClosure(NFA nfa,NFA nfaNULL){
-        nfa = positiveClosure(nfa,null);
+        positiveClosure(nfa,null);
         nfa.connectHeadToToe();
         return nfa;
     }

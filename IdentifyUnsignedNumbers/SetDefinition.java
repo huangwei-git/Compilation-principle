@@ -23,20 +23,24 @@ public class SetDefinition {
         add("0");add("1");add("2");add("3");add("4");add("5");add("6");add("7");add("8");add("9");
     }};
 
+    // 操作符集合
     public void setOpSymbols(HashSet<String> opSymbols,int mode) {
         if(mode == 0) this.operators = opSymbols;
         else this.operators.addAll(opSymbols);
     }
 
+    // 指数符号集合
     public void setExponents(HashSet<String> exponents,int mode) {
         if(mode == 0) this.exponents = exponents;
         else this.exponents.addAll(exponents);
     }
 
+    // 点集
     public void setDot(HashSet<String> dots,int mode) {
         if(mode == 0) this.dots = dots;
         else this.dots.addAll(dots);
     }
+
 
     public void setDigits(HashSet<String> digits,int mode) {
         if(mode == 0) this.digits = digits;
