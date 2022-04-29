@@ -3,11 +3,25 @@ package IdentifyUnsignedNumbers;
 import LexicalAnalysis.Separate;
 import LexicalAnalysis.Type;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class SeparateNum extends Separate {
     private SetDefinition setDefinition = new SetDefinition();
+    private boolean isMask = false;
+    private HashMap<String,String> maskOff = new HashMap<>(){{
+        put("A","0");put("B","1");put("C","2");put("D","3");put("E","4");put("F","5");
+        put("G","6");put("H","7");put("I","8");put("J","9");put("K",".");put("L","E");
+
+    }};
+    private HashMap<String,String> maskOn = new HashMap<>(){{
+        put("0","A");put("1","B");put("2","C");put("3","D");put("4","E");put("5","F");
+        put("6","G");put("7","H");put("8","I");put("9","J");put(".","K");put("E","L");
+    }};
 
     @Override
     public HashMap<String, HashSet<String>> work(String filePath) {
@@ -15,20 +29,67 @@ public class SeparateNum extends Separate {
         return separateText();
     }
 
+    // 载入路径文件的内容
+    @Override
+    public void load(String filePath) {
+        try {
+            // 初始化成员变量
+            text = new StringBuilder();
+            begin = -1;
+            FileReader fr = new FileReader(filePath);//创建字符输入流对象
+            BufferedReader br = new BufferedReader(fr);// 创建缓冲流
+            StringBuilder buffer = new StringBuilder();// 存储读取的每行内容
+            // 读取内容至其为空
+            while(!(buffer.append(br.readLine())).toString().equals("null")){
+                if(buffer.length() > 0){// 空行不读入
+                    if(isMask)
+                        for(int i = 0; i < buffer.length();i++){
+                            String sub = buffer.substring(i,i + 1);
+                            if(maskOff.containsKey(sub))
+                                buffer.replace(i,i + 1,maskOff.get(sub));
+                        }
+                    text.append(buffer);// 存储读取到的内容
+                    buffer = new StringBuilder();// 清空缓存内容
+                }
+            }
+            fr.close();// 关闭字符输入流
+            br.close();// 关闭缓冲流
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setMask(boolean mask){this.isMask = mask;}
+
+    // 存储seperateWord的返回结果
     @Override
     public HashMap<String, HashSet<String>> separateText() {
         HashMap<String,HashSet<String>> map = new HashMap<>();
         while(!isOutOfBounds()){
             Type type =  separateWord();
             if(type != null){
-                maskOff(type);
+                String value = type.value;
+                if (isMask) {
+                    if(!type.sign.equals("数字")) continue;
+                    int index = value.indexOf("E") + value.indexOf("e");
+                    if(index != -2){
+                        index++;
+                        int F = Integer.parseInt(value.substring(0,index));
+                        index+=2;
+                        int E = (int) Math.pow(10,Integer.parseInt(value.substring(index)));
+                        value = "" + (F*E);
+                    }
+                }
                 if(!map.containsKey(type.sign)){
                     System.out.println(type.sign + " " + type.value);
-                    map.put(type.sign,new HashSet<>(){{add(type.value);}});
+                    String finalValue = value;
+                    map.put(type.sign,new HashSet<>(){{add(finalValue);}});
                 }
                 else{
                     System.out.println(type.sign + " " + type.value);
-                    map.get(type.sign).add(type.value);
+                    map.get(type.sign).add(value);
                 }
             }
         }
@@ -202,13 +263,4 @@ public class SeparateNum extends Separate {
         return this.setDefinition;
     }
 
-    public void maskOff(Type type){
-        StringBuilder newVlue = new StringBuilder();
-        for(int i = 0;i < type.value.length();i++){
-            String tmp = type.value.substring(i,i + 1);
-            if(setDefinition.mask.containsKey(tmp)) newVlue.append(setDefinition.mask.get(tmp));
-            else newVlue.append(tmp);
-        }
-        type.value = newVlue.toString();
-    }
 }

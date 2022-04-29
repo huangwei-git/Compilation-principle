@@ -33,7 +33,6 @@ public class Separate{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public HashMap<String,HashSet<String>> work(String filePath){

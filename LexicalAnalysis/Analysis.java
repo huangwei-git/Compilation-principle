@@ -12,6 +12,7 @@ public class Analysis {
     // 各个词性的集合
     public HashMap<String, HashSet<String>> result;
 
+
     public void work(String readPath){
         File file = new File(readPath);
         String writePath = file.getParentFile().getPath() +  "/" + file.getName() + "_analysis.txt";

@@ -41,12 +41,13 @@ public class SetDefinition {
         else this.dots.addAll(dots);
     }
 
-
+    //数字集
     public void setDigits(HashSet<String> digits,int mode) {
         if(mode == 0) this.digits = digits;
         else this.digits.addAll(digits);
     }
 
+    // +和-
     public void setPlusAndMinus(HashSet<String> plusAndMinus,int mode) {
         if(mode == 0) this.plusAndMinus = plusAndMinus;
         else this.plusAndMinus.addAll(plusAndMinus);
