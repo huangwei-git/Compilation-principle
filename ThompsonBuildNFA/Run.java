@@ -1,19 +1,17 @@
+import ThompsonBuildNFA.Pair;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class Run{
     public static void main(String[] args) {
-        HashSet<Integer> set = new HashSet<>(){{
-            add(1);
-            add(2);
-            add(3);
-            add(4);
-        }};
-        Iterator<Integer> iter = set.iterator();
-        int tmp = 5;
-        for(Object i : set.toArray()){
-            System.out.println(i);
-            set.add(tmp++);
-        }
+        Pair p1 = new Pair("AM","a");
+        Pair p2 = new Pair("AM","a");
+        System.out.println(p1.equals(p2));
+        String s1 = "123455";
+        String s2 = "123455";
+        System.out.println(p1.hashCode());
+        System.out.println(p2.hashCode());
     }
 }

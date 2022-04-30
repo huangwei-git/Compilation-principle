@@ -1,6 +1,5 @@
 package ThompsonBuildNFA;
 
-import java.io.*;
 import java.util.*;
 
 public class InputIdentification {
@@ -60,27 +59,25 @@ public class InputIdentification {
 
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-//        Thompson thompson =  new Thompson("Go(((Java)|(Python))MySQL)*((Huang)+|(Wei)+)");
-        Thompson thompson =  new Thompson("ab*");
+        Thompson thompson =  new Thompson("Go(((Java)|(Python))MySQL)*((Huang)+|(Wei)+)");
+//        Thompson thompson =  new Thompson("a|(b|c)*de+");
 //        System.out.println(thompson.getNfa());
-/*
-        // No --> GoJavaMySQLJavaMySQL【?????】 --->缺少【(Huang)+】|【(Wei)+】
+//        thompson.getNfa().getGraph();
+
+        /* No --> GoJavaMySQLJavaMySQL【?????】 --->缺少【(Huang)+】|【(Wei)+】 */
         thompson.getNfa().identification("GoJavaMySQLJavaMySQL");
-        // YES
+        /* YES */
         thompson.getNfa().identification("GoJavaMySQLJavaMySQLHuangHuang");
-        // NO ---> GoJavaMySQLJavaMySQL【HuangWei】  ---> 应该为或运算,Huang与Wei不能同时出现
+        /* NO ---> GoJavaMySQLJavaMySQL【HuangWei】  ---> 应该为或运算,Huang与Wei不能同时出现 */
         thompson.getNfa().identification("GoJavaMySQLJavaMySQLHuangWei");
-        // YES
+        /* YES */
         thompson.getNfa().identification("GoJavaMySQLPythonMySQLWei");
-        // NO ---> GoJavaMySQLPython【?????】HuangHuang ---> 缺少【MySQL】
+        /* NO ---> GoJavaMySQLPython【?????】HuangHuang ---> 缺少【MySQL】 */
         thompson.getNfa().identification("GoJavaMySQLPythonHuangHuang");
-        // NO ---> GoJavaMySQL【????】MySQLHuangHuang ---> 缺少【Java】|【Python】
+        /* NO ---> GoJavaMySQL【????】MySQLHuangHuang ---> 缺少【Java】|【Python】 */
         thompson.getNfa().identification("GoJavaMySQLMySQLHuangHuang");
-        // YES
+        /* YES */
         thompson.getNfa().identification("GoWei");
-*/
-        thompson.getNfa().graph();
-        System.out.println(thompson.getNfa());
-        in.close();
+
     }
 }

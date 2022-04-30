@@ -4,6 +4,7 @@ package ThompsonBuildNFA;
 () [] ^* ^+ · |
 */
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -11,7 +12,7 @@ import java.util.TreeMap;
 //根据正规式创建运算树
 public class BuildTree {
     // 操作符优先级映射
-    private TreeMap<String,Integer> operatorPriorityMap = new TreeMap<>(){{
+    private HashMap<String,Integer> operatorPriorityMap = new HashMap<>(){{
         put("*",4);
         put("+",3);
         put("·",2);
@@ -72,14 +73,16 @@ public class BuildTree {
                 }
                 //计算栈内数字后入栈
                 else{
-                    String popOperator = operatorStack.pop();
-                    // 栈顶元素是单目运算符
-                    if(unaryOperators.contains(popOperator)){
-                        operandStack.add(calc(null,operandStack.pop(),popOperator));
-                    }
-                    // 栈顶操作符是双目运算符
-                    else{
-                        operandStack.add(calc(operandStack.pop(),operandStack.pop(),popOperator));
+                    while(operatorPriorityMap.get(nextSymbol) < operatorPriorityMap.get(operatorStack.peek())){
+                        String popOperator = operatorStack.pop();
+                        // 栈顶元素是单目运算符
+                        if(unaryOperators.contains(popOperator)){
+                            operandStack.add(calc(null,operandStack.pop(),popOperator));
+                        }
+                        // 栈顶操作符是双目运算符
+                        else{
+                            operandStack.add(calc(operandStack.pop(),operandStack.pop(),popOperator));
+                        }
                     }
                     //计算完后,信操作符入栈
                     operatorStack.add(nextSymbol);

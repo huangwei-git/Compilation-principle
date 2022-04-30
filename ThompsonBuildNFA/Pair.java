@@ -25,6 +25,25 @@ public class Pair implements Comparable<Pair>{
         return input;
     }
 
+
+    @Override
+    public int hashCode() {
+        String s = head +  "-" + input;
+        return s.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean res = false;
+        if(obj instanceof Pair){
+            Pair pair = (Pair)obj;
+            if(head.equals(((Pair) obj).getHead()) && input.equals(((Pair) obj).getInput())){
+                res = true;
+            }
+        }
+        return res;
+    }
+
     @Override
     public int compareTo(Pair o) {
         int compare = getHead().compareTo(o.getHead());

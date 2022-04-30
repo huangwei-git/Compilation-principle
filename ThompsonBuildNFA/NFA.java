@@ -10,26 +10,27 @@ public class NFA {
     private String head;// 开始
     private String toe;// 结束
     // 状态转移方程
-    private TreeMap<Pair,TreeSet<String>> transfer = new TreeMap<>();
-    private TreeSet<String> vn = new TreeSet<>();
-    private TreeSet<String> vt = new TreeSet<>();
+    private HashMap<Pair,HashSet<String>> transfer = new HashMap<>();
+    private HashSet<String> VN = new HashSet<>();
+    private HashSet<String> VT = new HashSet<>();
+    private String normalExpression;// 对应正规式
 
 /*构造函数*/
     public NFA(String input){
-        transfer.put(new Pair("A",input),new TreeSet<>(){{add("B");}});
-        vn.add("A");
-        vn.add("B");
-        vt.add(input);
+        transfer.put(new Pair("A",input),new HashSet<>(){{add("B");}});
+        VN.add("A");
+        VN.add("B");
+        VT.add(input);
         toe = "B";
         head = "A";
     }
 
     public void addTransfer(Pair pair, String c){
         if(transfer.containsKey(pair)) transfer.get(pair).add(c);
-        else transfer.put(new Pair(pair.getHead(),pair.getInput()),new TreeSet<>(){{add(c);}});
-        vn.add(pair.getHead());
-        vn.add(c);
-        vt.add(pair.getInput());
+        else transfer.put(new Pair(pair.getHead(),pair.getInput()),new HashSet<>(){{add(c);}});
+        VN.add(pair.getHead());
+        VN.add(c);
+        VT.add(pair.getInput());
     }
 
     //合并NFA
@@ -39,22 +40,22 @@ public class NFA {
         nfa.shift(bias);
         toe = nfa.toe;
         transfer.putAll(nfa.getTransfer());
-        vn.addAll(nfa.vn);
-        vt.addAll(nfa.vt);
+        VN.addAll(nfa.VN);
+        VT.addAll(nfa.VT);
         return res;
     }
 
     // 本的NFA的头部连接所传入NFA的头部
     public void connectHeadToHead(NFA nfa){
         addTransfer(new Pair(head,"ε"),nfa.head);
-        vt.add("ε");
+        VT.add("ε");
         ;
     }
 
     // 头部连接尾部，空转移
     public void connectHeadToToe(){
         addTransfer(new Pair(head,"ε"),toe);
-        vt.add("ε");
+        VT.add("ε");
         ;
     }
 
@@ -69,17 +70,17 @@ public class NFA {
     // 本NFA尾部连接本NFA头部
     public void connectToeToHead(){
         addTransfer(new Pair(toe,"ε"), head);
-        vt.add("ε");
+        VT.add("ε");
         ;
     }
 
     // 头部插入一个新状态，转移条件为epsilon
     public void addToHead(){
         shift(1);
-        vn.add("A");
+        VN.add("A");
         addTransfer(new Pair("A","ε"),head );
         head = "A";
-        vt.add("ε");
+        VT.add("ε");
         ;
     }
 
@@ -95,12 +96,12 @@ public class NFA {
     private void shift(int bias){
         toe = shift(toe,bias);
         head = shift(head,bias);
-        TreeMap<Pair,TreeSet<String>> newTransfer = new TreeMap<>();
-        TreeSet<String> newVN = new TreeSet<>();
+        HashMap<Pair,HashSet<String>> newTransfer = new HashMap<>();
+        HashSet<String> newVN = new HashSet<>();
         for(Pair pair : transfer.keySet()){
             String newHead = shift(pair.getHead(),bias);
             Pair newPair = new Pair(newHead,pair.getInput());
-            newTransfer.put(newPair,new TreeSet<>());
+            newTransfer.put(newPair,new HashSet<>());
             for(String oldToe : transfer.get(pair)){
                 String newToe = shift(oldToe,bias);
                 newTransfer.get(newPair).add(newToe);
@@ -109,7 +110,7 @@ public class NFA {
             }
         }
         transfer = newTransfer;
-        vn = newVN;
+        VN = newVN;
         ;
     }
 
@@ -160,6 +161,8 @@ public class NFA {
     }
 
     public void identification(String input){
+        int res = input.length();
+        int idx = -1;
         // 存储当前所在状态
         HashSet<String> currentStates = new HashSet<>();
         // 出发点的epsilon闭包为初始状态
@@ -167,7 +170,11 @@ public class NFA {
         // 遍历输入的字符串中的字符
         for(char c : input.toCharArray()){
             // 若当前状态为空，则退出
-            if(currentStates.isEmpty()) break;
+            if(currentStates.isEmpty()){
+                res = idx;
+                break;
+            }
+            idx++;
             // 存储下一次的状态
             HashSet<String> nextStates = new HashSet<>();
             // 遍历当前所在状态
@@ -189,8 +196,16 @@ public class NFA {
                     epsilon((String)o,currentStates);
             }
         }
+        System.out.println("input:\"" + input + "\"");
         if(currentStates.contains(toe)) System.out.println("YES");
-        else System.out.println("NO");
+        else{
+            if (res == input.length())
+                System.out.println("NO,error at[" + idx +"]:\"" + input.substring(0,res) + "[___]\";");
+            else
+                System.out.println("NO,error at ["+ idx +"]:\"" + input.substring(0,res) +
+                        "[" + input.substring(res) + "]\";");
+        }
+        System.out.println("------------------------------------");
     }
 
     public String getHead(){
@@ -201,7 +216,15 @@ public class NFA {
         return toe;
     }
 
-    public TreeMap<Pair, TreeSet<String>> getTransfer() {
+    public String getNormalExpression() {
+        return normalExpression;
+    }
+
+    public void setNormalExpression(String normalExpression) {
+        this.normalExpression = normalExpression;
+    }
+
+    public HashMap<Pair, HashSet<String>> getTransfer() {
         return transfer;
     }
 
@@ -216,16 +239,18 @@ public class NFA {
     }
 
     //markdown画NFA：
-    public void graph(){
+    public void getGraph(){
         StringBuilder output = new StringBuilder();
-        output.append(">" + toString()+"\n");
-        if(vn.size() > 20){
+        output.append("## 正规式：" + normalExpression + "\n");
+        output.append(">" + toString().replace("δ","&emsp;δ")+"\n");
+        StringBuilder sb = new StringBuilder();
+        if(VN.size() > 20){
             output.append("```mermaid\ngraph TB\n\n");
         }else{
             output.append("```mermaid\ngraph LR\n\n");
         }
-        TreeMap<Pair, TreeSet<String>> map = transfer;
-        for(Map.Entry<Pair,TreeSet<String>> entry: map.entrySet()){
+        HashMap<Pair, HashSet<String>> map = transfer;
+        for(Map.Entry<Pair,HashSet<String>> entry: map.entrySet()){
             String start = entry.getKey().getHead();
             String input = entry.getKey().getInput();
             for(String end : entry.getValue()){
@@ -260,25 +285,43 @@ public class NFA {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
+        // 将非终结符排序存储至orderVN中
         TreeSet<String> orderVN = new TreeSet<>(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
                 return SToV(o1) - SToV(o2);
             }
         });
-        orderVN.addAll(vn);
-        res.append("K={" + getString(orderVN) + "};\nΣ={" + getString(vt) + "};\n");
+        orderVN.addAll(VN);
+        // 将终结符排序存储至orderVT中
+        TreeSet<String> orderVT = new TreeSet<>(VT);
+        res.append("K={" + getString(orderVN) + "};\nΣ={" + getString(orderVT) + "};\n");
+        // 存储状态转移方程
         StringBuilder equation = new StringBuilder();
         equation.append("F={\n");
-        for (Map.Entry<Pair,TreeSet<String>> entry : transfer.entrySet()){
-            Pair key = entry.getKey();
-            String head = key.getHead();
-            String input = key.getInput();
-            equation.append("    δ(" + head + "," + input + ")=" + entry.getValue() + ",\n");
+        // 排序状态方程的Key值
+        TreeSet<Pair> orderPair = new TreeSet<>(new Comparator<Pair>() {
+            @Override
+            public int compare(Pair o1, Pair o2) {
+                if(o1.getHead().equals(o2.getHead())) return o1.compareTo(o2);
+                else return SToV(o1.getHead()) - SToV(o2.getHead());
+            }
+        });
+        orderPair.addAll(transfer.keySet());
+        // 遍历keys
+        for(Pair pair : orderPair){
+            String head = pair.getHead();
+            String input = pair.getInput();
+            TreeSet<String> toes = new TreeSet<>(transfer.get(pair));
+            // 使用之前实现了comparator方法的HashSet对象，用于排序状态转移的结果
+            orderVN.clear();
+            orderVN.addAll(transfer.get(pair));
+            equation.append("    δ(" + head + "," + input + ")=" + orderVN + ",\n");
         }
+        // 去除最后多于的 ','
         int len = equation.length();
         equation.replace(len - 1,len,"\n};\n");
-        res.append(equation + "S=[" + head + "];\n" + "Z={" + toe + "}");
+        res.append(equation + "S={" + head + "};\n" + "Z={" + toe + "}");
 
 
         return res.toString();

@@ -9,6 +9,7 @@ public class Thompson {
     public Thompson(String normalExpression){
         tree = new BuildTree().getTree(normalExpression);
         nfa = BuildNFA(tree);
+        nfa.setNormalExpression(normalExpression);
     }
 
     public NFA BuildNFA(Node root){

@@ -5,7 +5,8 @@ public class Node{
     String value;
     Node lchild;
     Node rchild;
-    int brackets = 0;//该结点是否有括号
+    //该结点是否有括号
+    int brackets = 0;
 
     public Node(String value){
         this.value = value;
