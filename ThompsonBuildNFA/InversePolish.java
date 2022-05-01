@@ -9,9 +9,11 @@ import java.util.HashSet;
 import java.util.Stack;
 
 //根据正规式创建运算树
-public class BuildTree {
+public class InversePolish {
+/*======Arrtibute======*/
+
     // 操作符优先级映射
-    private HashMap<String,Integer> operatorPriorityMap = new HashMap<>(){{
+    private static final HashMap<String,Integer> operatorPriorityMap = new HashMap<>(){{
         put("*",4);
         put("+",3);
         put("·",2);
@@ -19,28 +21,54 @@ public class BuildTree {
         put("\0",-1);
     }};
     // 左括号
-    private HashSet<String> leftBracket = new HashSet<>(){{
+    private static final HashSet<String> leftBracket = new HashSet<>(){{
        add("(");
     }};
     // 右括号
-    private HashSet<String> rightBracket = new HashSet<>(){{
+    private static final HashSet<String> rightBracket = new HashSet<>(){{
        add(")");
     }};
     // 单目运算符
-    private HashSet<String> unaryOperators = new HashSet<>(){{
+    private static final HashSet<String> unaryOperators = new HashSet<>(){{
         add("*");
         add("+");
     }};
-    private int idx = -1;
-    private boolean lastIsOperator = true;//判断上一个符号是否为运算符，用于识别是否有"·"运算符被省略
+    private static int idx;
+    //判断上一个符号是否为运算符，用于识别是否有"·"运算符被省略
+    private static boolean lastIsOperator;
 
-    // 计算Node1 op Node2
-    private Node calc(Node node1,Node node2,String op){
-        return new Node(op,node1,node2);
+/*======Method======*/
+
+    // 根据正规式获取运算符树
+    public static Node getTree(String normalExpression){
+        // 初始化
+        idx = -1;
+        lastIsOperator = true;
+        return buildTree(normalExpression);
+    }
+
+    // 根据逆波兰式构建的树推出正规式
+    public String getNormalExpression(Node node){
+        StringBuilder exp = new StringBuilder();
+        if(node != null){
+            exp.append(getNormalExpression(node.getRightChild()));
+            if(!node.getValue().equals("·")) exp.append(node.getValue());
+            exp.append(getNormalExpression(node.getLeftChild()));
+            if (node.isBrackets()){
+                exp.insert(0,"(");
+                exp.append(")");
+            }
+        }
+        return exp.toString();
+    }
+
+    // 将左右子树结合起来，根结点的值为op
+    private static Node combine(Node leftNode, Node rightNode, String op){
+        return new Node(op,leftNode,rightNode);
     }
 
     //根据正规式s构建运算树
-    private Node buildTree(String normalExpression){
+    private static Node buildTree(String normalExpression){
         //操作数栈
         Stack<Node> operandStack = new Stack<>();
         //操作符栈
@@ -57,9 +85,9 @@ public class BuildTree {
             }
             // 左括号
             if(leftBracket.contains(nextSymbol)){
-                Node get = buildTree(normalExpression);
-                get.brackets = 1;
-                operandStack.add(get);
+                Node nfa = buildTree(normalExpression);
+                nfa.setBrackets(true);
+                operandStack.add(nfa);
                 lastIsOperator = false;
             }
             //如果是操作符
@@ -76,11 +104,11 @@ public class BuildTree {
                         String popOperator = operatorStack.pop();
                         // 栈顶元素是单目运算符
                         if(unaryOperators.contains(popOperator)){
-                            operandStack.add(calc(null,operandStack.pop(),popOperator));
+                            operandStack.add(combine(null,operandStack.pop(),popOperator));
                         }
                         // 栈顶操作符是双目运算符
                         else{
-                            operandStack.add(calc(operandStack.pop(),operandStack.pop(),popOperator));
+                            operandStack.add(combine(operandStack.pop(),operandStack.pop(),popOperator));
                         }
                     }
                     //计算完后,信操作符入栈
@@ -99,28 +127,11 @@ public class BuildTree {
             popOperator = operatorStack.pop();
             //栈顶是单目运算符
             if(unaryOperators.contains(popOperator))
-                operandStack.add(calc(null,operandStack.pop(),popOperator));
+                operandStack.add(combine(null,operandStack.pop(),popOperator));
             //栈顶是双目运算符
             else
-                operandStack.add(calc(operandStack.pop(),operandStack.pop(),popOperator));
+                operandStack.add(combine(operandStack.pop(),operandStack.pop(),popOperator));
         }
         return operandStack.pop();
-    }
-
-    // 根据正规式获取运算符树
-    public Node getTree(String normalExpression){
-        idx = -1;// 初始化
-        return buildTree(normalExpression);
-    }
-
-    // 中序遍历
-    public void inOrderTraversal(Node node){
-        if(node != null){
-            if(node.brackets == 1) System.out.print("(");
-            inOrderTraversal(node.rchild);
-            if(!node.value.equals("·")) System.out.print(node.value);
-            inOrderTraversal(node.lchild);
-            if (node.brackets == 1) System.out.print(")");
-        }
     }
 }

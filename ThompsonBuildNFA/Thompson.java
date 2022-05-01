@@ -1,123 +1,92 @@
 package ThompsonBuildNFA;
 
 public class Thompson {
-    private NFA nfa;
-    private Node tree;
 
-    public Thompson(){}
+// 输入正规式，返回对应NFA
+public static NFA buildNFA(String normalExpression){
+    NFA nfa = buildNFA(InversePolish.getTree(normalExpression));
+    nfa.setNormalExpression(normalExpression);
+    return nfa;
+}
 
-    public Thompson(String normalExpression){
-        tree = new BuildTree().getTree(normalExpression);
-        nfa = BuildNFA(tree);
-        nfa.setNormalExpression(normalExpression);
-    }
-
-    public NFA BuildNFA(Node root){
-        NFA res = null;
-        if(root != null){
-            NFA rightNFA = BuildNFA(root.rchild);
-            NFA leftNFA = null;
-            leftNFA = BuildNFA(root.lchild);
-            if(rightNFA == null) res = new NFA(root.value);
-            else{
-                res = calc(root.value,rightNFA,leftNFA);
-            }
+// 后序遍历传入的二叉树，创建对应NFA
+private static NFA buildNFA(Node root){
+    NFA res = null;
+    if(root != null){
+        NFA rightNFA = buildNFA(root.getRightChild());
+        NFA leftNFA = null;
+        leftNFA = buildNFA(root.getLeftChild());
+        if(rightNFA == null) res = new NFA(root.getValue());
+        else{
+            res = combineNFA(root.getValue(),rightNFA,leftNFA);
         }
-        return res;
     }
+    return res;
+}
 
-    private NFA calc(String operator,NFA rightNFA,NFA leftNFA){
-        NFA res = null;
-        if(operator.equals("|")){
-            res = OR(rightNFA,leftNFA);
-        }else if(operator.equals("·")){
-            res = AND(rightNFA,leftNFA);
-        }else if(operator.equals("*")){
-            res = klinClosure(rightNFA,leftNFA);
-        }else if(operator.equals("+")){
-            res = positiveClosure(rightNFA,leftNFA);
-        }
-        return res;
+// 根据操作符operator的类型，按照相应规则合并right和leftNFA
+private static NFA combineNFA(String operator, NFA rightNFA, NFA leftNFA){
+    NFA res = null;
+    if(operator.equals("|")){
+        res = OR(rightNFA,leftNFA);
+    }else if(operator.equals("·")){
+        res = AND(rightNFA,leftNFA);
+    }else if(operator.equals("*")){
+        res = klinClosure(rightNFA,leftNFA);
+    }else if(operator.equals("+")){
+        res = positiveClosure(rightNFA,leftNFA);
     }
+    return res;
+}
 
-    private NFA AND(NFA rightNFA,NFA leftNFA){
-        String res = rightNFA.merge(leftNFA);
-        connectToeToHead(res,rightNFA,leftNFA);
-        return rightNFA;
-    }
+private static NFA AND(NFA rightNFA,NFA leftNFA){
+    String res = rightNFA.merge(leftNFA);
+    String newToe = leftNFA.getToe();
+    rightNFA.addTransfer(new Pair(res,"ε"),leftNFA.getHead());
+    rightNFA.setToe(newToe);
+    return rightNFA;
+}
 
-    private NFA OR(NFA rightNFA,NFA leftNFA){
-        addToHead(rightNFA);
-        String recordToe = rightNFA.getToe();
-        rightNFA.merge(leftNFA);
-        addToToe(rightNFA);
-        connectHeadToHead(rightNFA,leftNFA);
-        rightNFA.addTransfer(new Pair(recordToe,"ε"),rightNFA.getToe());
-        return rightNFA;
-    }
+private static NFA OR(NFA rightNFA,NFA leftNFA){
+    rightNFA.shift(1);
+    rightNFA.getVN().add("A");
+    rightNFA.addTransfer(new Pair("A","ε"),rightNFA.getHead());
+    rightNFA.setHead("A");
+    rightNFA.getVT().add("ε");
+    String recordToe = rightNFA.getToe();
+    rightNFA.merge(leftNFA);
+    String oldToe = rightNFA.getToe();
+    rightNFA.setToe(rightNFA.shift(rightNFA.getToe(),1));
+    rightNFA.addTransfer(new Pair(oldToe,"ε"),rightNFA.getToe());
 
-
-    private NFA positiveClosure(NFA rightNFA,NFA leftNFA){
-        connectToeToHead(rightNFA);
-        addToHead(rightNFA);
-        addToToe(rightNFA);
-        return rightNFA;
-    }
-
-    private NFA klinClosure(NFA rightNFA,NFA leftNFA){
-        positiveClosure(rightNFA,null);
-        connectHeadToToe(rightNFA);
-        return rightNFA;
-    }
-
-    public NFA getNfa() {
-        return nfa;
-    }
+    rightNFA.addTransfer(new Pair(rightNFA.getHead(),"ε"),leftNFA.getHead());
+    rightNFA.getVT().add("ε");
+    rightNFA.addTransfer(new Pair(recordToe,"ε"),rightNFA.getToe());
+    return rightNFA;
+}
 
 
-    // 本的NFA的头部连接所传入NFA的头部
-    public void connectHeadToHead(NFA nfa1,NFA nfa2){
-        nfa1.addTransfer(new Pair(nfa1.getHead(),"ε"),nfa2.getHead());
-        nfa1.getVT().add("ε");
-        ;
-    }
+private static NFA positiveClosure(NFA rightNFA,NFA leftNFA){
+    rightNFA.addTransfer(new Pair(rightNFA.getToe(),"ε"), rightNFA.getHead());
+    rightNFA.getVT().add("ε");
 
-    // 头部连接尾部，空转移
-    public void connectHeadToToe(NFA nfa){
-        nfa.addTransfer(new Pair(nfa.getHead(),"ε"),nfa.getToe());
-        nfa.getVT().add("ε");
-        ;
-    }
+    rightNFA.shift(1);
+    rightNFA.getVN().add("A");
+    rightNFA.addTransfer(new Pair("A","ε"),rightNFA.getHead());
+    rightNFA.setHead("A");
+    rightNFA.getVT().add("ε");
 
-    // 本NFA的尾部连接所传入NFA的头部
-    public void connectToeToHead(String toe,NFA nfa1,NFA nfa2){
-        String newToe = nfa2.getToe();
-        nfa1.addTransfer(new Pair(toe,"ε"),nfa2.getHead());
-        nfa1.setToe(newToe);
-    }
+    String oldToe = rightNFA.getToe();
+    rightNFA.setToe(rightNFA.shift(rightNFA.getToe(),1));
+    rightNFA.addTransfer(new Pair(oldToe,"ε"),rightNFA.getToe());
+    return rightNFA;
+}
 
-    // 本NFA尾部连接本NFA头部
-    public void connectToeToHead(NFA nfa){
-        nfa.addTransfer(new Pair(nfa.getToe(),"ε"), nfa.getHead());
-        nfa.getVT().add("ε");
-    }
-
-    // 头部插入一个新状态，转移条件为epsilon
-    public void addToHead(NFA nfa){
-        nfa.shift(1);
-        nfa.getVN().add("A");
-        nfa.addTransfer(new Pair("A","ε"),nfa.getHead());
-        nfa.setHead("A");
-        nfa.getVT().add("ε");
-        ;
-    }
-
-    // 尾部插入一个新状态，转移条件为epsilon
-    public void addToToe(NFA nfa){
-        String oldToe = nfa.getToe();
-        nfa.setToe(nfa.shift(nfa.getToe(),1));
-        nfa.addTransfer(new Pair(oldToe,"ε"),nfa.getToe());
-        ;
-    }
+private static NFA klinClosure(NFA rightNFA,NFA leftNFA){
+    positiveClosure(rightNFA,null);
+    rightNFA.addTransfer(new Pair(rightNFA.getHead(),"ε"),rightNFA.getToe());
+    rightNFA.getVT().add("ε");
+    return rightNFA;
+}
 
 }

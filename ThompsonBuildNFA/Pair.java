@@ -1,34 +1,17 @@
 package ThompsonBuildNFA;
 
 public class Pair implements Comparable<Pair>{
-    private String head;
+    private String state;
     private String input;
 
     public Pair(String start, String input) {
-        this.head = start;
+        this.state = start;
         this.input = input;
     }
-
-    public void setHead(String head) {
-        this.head = head;
-    }
-
-    public void setInput(String input) {
-        this.input = input;
-    }
-
-    public String getHead() {
-        return head;
-    }
-
-    public String getInput() {
-        return input;
-    }
-
 
     @Override
     public int hashCode() {
-        String s = head +  "-" + input;
+        String s = state +  "-" + input;
         return s.hashCode();
     }
 
@@ -37,7 +20,7 @@ public class Pair implements Comparable<Pair>{
         boolean res = false;
         if(obj instanceof Pair){
             Pair pair = (Pair)obj;
-            if(head.equals(((Pair) obj).getHead()) && input.equals(((Pair) obj).getInput())){
+            if(state.equals(((Pair) obj).getState()) && input.equals(((Pair) obj).getInput())){
                 res = true;
             }
         }
@@ -46,10 +29,26 @@ public class Pair implements Comparable<Pair>{
 
     @Override
     public int compareTo(Pair o) {
-        int compare = getHead().compareTo(o.getHead());
+        int compare = getState().compareTo(o.getState());
         if(compare == 0){
             compare = getInput().compareTo(o.getInput());
         }
         return compare;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getInput() {
+        return input;
     }
 }

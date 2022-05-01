@@ -7,15 +7,21 @@ import java.io.IOException;
 import java.util.*;
 
 public class NFA {
-    private String head;// 开始
-    private String toe;// 结束
+/*======Attribute======*/
+    // 开始状态
+    private String head;
+    // 接收状态
+    private String toe;
     // 状态转移方程
     private HashMap<Pair,HashSet<String>> transfer = new HashMap<>();
+    // 非终结符集
     private HashSet<String> VN = new HashSet<>();
+    // 终结符集
     private HashSet<String> VT = new HashSet<>();
-    private String normalExpression;// 对应正规式
+    // 该NFA对应的正规式
+    private String normalExpression;
 
-/*构造函数*/
+/*======Public Method======*/
     public NFA(String input){
         transfer.put(new Pair("A",input),new HashSet<>(){{add("B");}});
         VN.add("A");
@@ -25,18 +31,19 @@ public class NFA {
         head = "A";
     }
 
+    // 添加一个状态转移函数
     public void addTransfer(Pair pair, String c){
         if(transfer.containsKey(pair)) transfer.get(pair).add(c);
-        else transfer.put(new Pair(pair.getHead(),pair.getInput()),new HashSet<>(){{add(c);}});
-        VN.add(pair.getHead());
+        else transfer.put(new Pair(pair.getState(),pair.getInput()),new HashSet<>(){{add(c);}});
+        VN.add(pair.getState());
         VN.add(c);
         VT.add(pair.getInput());
     }
 
-    //合并NFA
+    // 合并传入的nfa
     public String merge(NFA nfa){
         String res = toe;
-        int bias = SToV(toe);
+        int bias = stateToValue(toe);
         nfa.shift(bias);
         toe = nfa.toe;
         transfer.putAll(nfa.getTransfer());
@@ -45,14 +52,14 @@ public class NFA {
         return res;
     }
 
-    //NFA所有状态移动一个偏置量bias
+    // NFA所有状态标识符移动一个偏置量bias
     public void shift(int bias){
         toe = shift(toe,bias);
         head = shift(head,bias);
         HashMap<Pair,HashSet<String>> newTransfer = new HashMap<>();
         HashSet<String> newVN = new HashSet<>();
         for(Pair pair : transfer.keySet()){
-            String newHead = shift(pair.getHead(),bias);
+            String newHead = shift(pair.getState(),bias);
             Pair newPair = new Pair(newHead,pair.getInput());
             newTransfer.put(newPair,new HashSet<>());
             for(String oldToe : transfer.get(pair)){
@@ -67,32 +74,11 @@ public class NFA {
         ;
     }
 
-    //把字符串s偏移step
-    public String shift(String s, int step){
-        return VToS(SToV(s) + step);
+    // 获得某一状态标识符state向后偏移bias后的状态标识符
+    public String shift(String state, int bias){
+        return valueToState(stateToValue(state) + bias);
     }
 
-    private int SToV(String s){
-        int len = s.length();
-        int res = s.charAt(--len) - 'A' + 1;
-        int power = 26;
-        while(--len >= 0){
-            res += power * (s.charAt(len) - 'A' + 1);
-            power *= 26;
-        }
-        return res;
-}
-
-    private String VToS(int v){
-        StringBuilder res = new StringBuilder();
-        while(v != 0){
-            v--;
-            char c = (char) (v % 26 + 'A');
-            res.insert(0,c);
-            v /= 26;
-        }
-        return res.toString();
-    }
 
     // 递归获取状态s的epsilon闭包
     public void epsilon(String state, Set<String> currentStates){
@@ -113,6 +99,7 @@ public class NFA {
         }
     }
 
+    // 判断输入的字符串是否能被该NFA接收
     public void identification(String input){
         int res = input.length();
         int idx = -1;
@@ -161,54 +148,8 @@ public class NFA {
         System.out.println("------------------------------------");
     }
 
-    public String getHead(){
-        return head;
-    }
-
-    public void setHead(String head) {
-        this.head = head;
-    }
-
-    public String getToe() {
-        return toe;
-    }
-
-    public void setToe(String toe) {
-        this.toe = toe;
-    }
-
-    public HashSet<String> getVN() {
-        return VN;
-    }
-
-    public HashSet<String> getVT() {
-        return VT;
-    }
-
-    public String getNormalExpression() {
-        return normalExpression;
-    }
-
-    public void setNormalExpression(String normalExpression) {
-        this.normalExpression = normalExpression;
-    }
-
-    public HashMap<Pair, HashSet<String>> getTransfer() {
-        return transfer;
-    }
-
-    private String getString(Set<String> set){
-        StringBuilder res = new StringBuilder();
-        Iterator<String> iterator = set.iterator();
-        while(iterator.hasNext()){
-            res.append(iterator.next());
-            if(iterator.hasNext()) res.append(",");
-        }
-        return res.toString();
-    }
-
-    //markdown画NFA：
-    public void getGraph(){
+    // 用markdown语法,画出该NFA：
+    public void drawWithMarkdown(){
         StringBuilder output = new StringBuilder();
         output.append("## 正规式：" + normalExpression + "\n");
         output.append(">" + toString().replace("δ","&emsp;δ")+"\n");
@@ -220,7 +161,7 @@ public class NFA {
         }
         HashMap<Pair, HashSet<String>> map = transfer;
         for(Map.Entry<Pair,HashSet<String>> entry: map.entrySet()){
-            String start = entry.getKey().getHead();
+            String start = entry.getKey().getState();
             String input = entry.getKey().getInput();
             for(String end : entry.getValue()){
                 output.append(start + "-->|" + input + "|" + end + "\n");
@@ -258,13 +199,13 @@ public class NFA {
         TreeSet<String> orderVN = new TreeSet<>(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
-                return SToV(o1) - SToV(o2);
+                return stateToValue(o1) - stateToValue(o2);
             }
         });
         orderVN.addAll(VN);
         // 将终结符排序存储至orderVT中
         TreeSet<String> orderVT = new TreeSet<>(VT);
-        res.append("K={" + getString(orderVN) + "};\nΣ={" + getString(orderVT) + "};\n");
+        res.append("K={" + formatSetElement(orderVN) + "};\nΣ={" + formatSetElement(orderVT) + "};\n");
         // 存储状态转移方程
         StringBuilder equation = new StringBuilder();
         equation.append("F={\n");
@@ -272,14 +213,14 @@ public class NFA {
         TreeSet<Pair> orderPair = new TreeSet<>(new Comparator<Pair>() {
             @Override
             public int compare(Pair o1, Pair o2) {
-                if(o1.getHead().equals(o2.getHead())) return o1.compareTo(o2);
-                else return SToV(o1.getHead()) - SToV(o2.getHead());
+                if(o1.getState().equals(o2.getState())) return o1.compareTo(o2);
+                else return stateToValue(o1.getState()) - stateToValue(o2.getState());
             }
         });
         orderPair.addAll(transfer.keySet());
         // 遍历keys
         for(Pair pair : orderPair){
-            String head = pair.getHead();
+            String head = pair.getState();
             String input = pair.getInput();
             TreeSet<String> toes = new TreeSet<>(transfer.get(pair));
             // 使用之前实现了comparator方法的HashSet对象，用于排序状态转移的结果
@@ -292,8 +233,79 @@ public class NFA {
         equation.replace(len - 1,len,"\n};\n");
         res.append(equation + "S={" + head + "};\n" + "Z={" + toe + "}");
 
-
         return res.toString();
     }
 
+    /*======Getter AND Setter======*/
+    public String getHead(){
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
+    }
+
+    public String getToe() {
+        return toe;
+    }
+
+    public void setToe(String toe) {
+        this.toe = toe;
+    }
+
+    public HashSet<String> getVN() {
+        return VN;
+    }
+
+    public HashSet<String> getVT() {
+        return VT;
+    }
+
+    public String getNormalExpression() {
+        return normalExpression;
+    }
+
+    public void setNormalExpression(String normalExpression) {
+        this.normalExpression = normalExpression;
+    }
+
+    public HashMap<Pair, HashSet<String>> getTransfer() {
+        return transfer;
+    }
+    /*======Pritave Method======*/
+
+    // 将集合中Set中的元素按一定规则输出，用于toString方法输出格式化
+    private String formatSetElement(Set<String> set){
+        StringBuilder res = new StringBuilder();
+        Iterator<String> iterator = set.iterator();
+        while(iterator.hasNext()){
+            res.append(iterator.next());
+            if(iterator.hasNext()) res.append(",");
+        }
+        return res.toString();
+    }
+
+    // 将状态量化，方便排序与状态枚举
+    private int stateToValue(String s){
+        int len = s.length();
+        int res = s.charAt(--len) - 'A' + 1;
+        int power = 26;
+        while(--len >= 0){
+            res += power * (s.charAt(len) - 'A' + 1);
+            power *= 26;
+        }
+        return res;
+    }
+
+    // 权重转变为状态
+    private String valueToState(int v){
+        StringBuilder res = new StringBuilder();
+        while(v != 0){
+            v--;
+            char c = (char) (v % 26 + 'A');
+            res.insert(0,c);
+            v /= 26;
+        }
+        return res.toString();
+    }
 }
