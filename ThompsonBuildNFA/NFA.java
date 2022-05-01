@@ -45,55 +45,8 @@ public class NFA {
         return res;
     }
 
-    // 本的NFA的头部连接所传入NFA的头部
-    public void connectHeadToHead(NFA nfa){
-        addTransfer(new Pair(head,"ε"),nfa.head);
-        VT.add("ε");
-        ;
-    }
-
-    // 头部连接尾部，空转移
-    public void connectHeadToToe(){
-        addTransfer(new Pair(head,"ε"),toe);
-        VT.add("ε");
-        ;
-    }
-
-    // 本NFA的尾部连接所传入NFA的头部
-    public void connectToeToHead(String toe,NFA nfa){
-        String newToe = nfa.toe;
-        addTransfer(new Pair(toe,"ε"),nfa.head);
-        this.toe = newToe;
-        ;
-    }
-
-    // 本NFA尾部连接本NFA头部
-    public void connectToeToHead(){
-        addTransfer(new Pair(toe,"ε"), head);
-        VT.add("ε");
-        ;
-    }
-
-    // 头部插入一个新状态，转移条件为epsilon
-    public void addToHead(){
-        shift(1);
-        VN.add("A");
-        addTransfer(new Pair("A","ε"),head );
-        head = "A";
-        VT.add("ε");
-        ;
-    }
-
-    // 尾部插入一个新状态，转移条件为epsilon
-    public void addToToe(){
-        String oldToe = toe;
-        toe = shift(toe,1);
-        addTransfer(new Pair(oldToe,"ε"),toe);
-        ;
-    }
-
     //NFA所有状态移动一个偏置量bias
-    private void shift(int bias){
+    public void shift(int bias){
         toe = shift(toe,bias);
         head = shift(head,bias);
         HashMap<Pair,HashSet<String>> newTransfer = new HashMap<>();
@@ -115,7 +68,7 @@ public class NFA {
     }
 
     //把字符串s偏移step
-    private String shift(String s,int step){
+    public String shift(String s, int step){
         return VToS(SToV(s) + step);
     }
 
@@ -212,8 +165,24 @@ public class NFA {
         return head;
     }
 
+    public void setHead(String head) {
+        this.head = head;
+    }
+
     public String getToe() {
         return toe;
+    }
+
+    public void setToe(String toe) {
+        this.toe = toe;
+    }
+
+    public HashSet<String> getVN() {
+        return VN;
+    }
+
+    public HashSet<String> getVT() {
+        return VT;
     }
 
     public String getNormalExpression() {
@@ -228,13 +197,13 @@ public class NFA {
         return transfer;
     }
 
-       private String getString(Set<String> set){
+    private String getString(Set<String> set){
         StringBuilder res = new StringBuilder();
         Iterator<String> iterator = set.iterator();
         while(iterator.hasNext()){
             res.append(iterator.next());
             if(iterator.hasNext()) res.append(",");
-         }
+        }
         return res.toString();
     }
 
