@@ -258,7 +258,7 @@ public class NFA {
             }
         }
         output.append("```");
-        File file = new File("./src/resource/NFA.md");
+        File file = new File("./src/ThompsonBuildNFA/resource/NFA.md");
         if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
         FileWriter fr = null;
         try {

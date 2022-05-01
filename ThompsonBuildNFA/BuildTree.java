@@ -7,7 +7,6 @@ package ThompsonBuildNFA;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
-import java.util.TreeMap;
 
 //根据正规式创建运算树
 public class BuildTree {
@@ -41,14 +40,14 @@ public class BuildTree {
     }
 
     //根据正规式s构建运算树
-    private Node build(String s){
+    private Node buildTree(String normalExpression){
         //操作数栈
         Stack<Node> operandStack = new Stack<>();
         //操作符栈
         Stack<String> operatorStack = new Stack<>();
         operatorStack.add("\0");// 栈底压入哨兵字符串
-        while(++idx < s.length()){
-            String nextSymbol = s.substring(idx,idx + 1);
+        while(++idx < normalExpression.length()){
+            String nextSymbol = normalExpression.substring(idx,idx + 1);
             // 右括号
             if(rightBracket.contains(nextSymbol)) break;
             // 如果连续两个操作数，则中间补充一个·运算符
@@ -58,7 +57,7 @@ public class BuildTree {
             }
             // 左括号
             if(leftBracket.contains(nextSymbol)){
-                Node get = build(s);
+                Node get = buildTree(normalExpression);
                 get.brackets = 1;
                 operandStack.add(get);
                 lastIsOperator = false;
@@ -109,9 +108,9 @@ public class BuildTree {
     }
 
     // 根据正规式获取运算符树
-    public Node getTree(String s){
+    public Node getTree(String normalExpression){
         idx = -1;// 初始化
-        return build(s);
+        return buildTree(normalExpression);
     }
 
     // 中序遍历

@@ -1,17 +1,18 @@
-import ThompsonBuildNFA.Pair;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
 
 public class Run{
+    public void test(){
+        File f = new File(this.getClass().getResource("").getPath());
+
+        System.out.println(f);
+    }
+
     public static void main(String[] args) {
-        Pair p1 = new Pair("AM","a");
-        Pair p2 = new Pair("AM","a");
-        System.out.println(p1.equals(p2));
-        String s1 = "123455";
-        String s2 = "123455";
-        System.out.println(p1.hashCode());
-        System.out.println(p2.hashCode());
+        new Run().test();
     }
 }
