@@ -1,0 +1,135 @@
+## 正规式：Go(((Java)|(Python))MySQL)*((Huang)+|(Wei)+)
+>K={A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,AB,AC,AD,AE,AF,AG,AH,AI,AJ,AK,AL,AM,AN,AO,AP,AQ,AR,AS,AT,AU,AV,AW,AX,AY,AZ,BA,BB,BC,BD,BE,BF,BG,BH};
+Σ={G,H,J,L,M,P,Q,S,W,a,e,g,h,i,n,o,t,u,v,y,ε};
+F={
+    &emsp;δ(A,G)=[B],
+    &emsp;δ(B,ε)=[C],
+    &emsp;δ(C,o)=[D],
+    &emsp;δ(D,ε)=[E],
+    &emsp;δ(E,ε)=[F, AL],
+    &emsp;δ(F,ε)=[G, O],
+    &emsp;δ(G,J)=[H],
+    &emsp;δ(H,ε)=[I],
+    &emsp;δ(I,a)=[J],
+    &emsp;δ(J,ε)=[K],
+    &emsp;δ(K,v)=[L],
+    &emsp;δ(L,ε)=[M],
+    &emsp;δ(M,a)=[N],
+    &emsp;δ(N,ε)=[AA],
+    &emsp;δ(O,P)=[P],
+    &emsp;δ(P,ε)=[Q],
+    &emsp;δ(Q,y)=[R],
+    &emsp;δ(R,ε)=[S],
+    &emsp;δ(S,t)=[T],
+    &emsp;δ(T,ε)=[U],
+    &emsp;δ(U,h)=[V],
+    &emsp;δ(V,ε)=[W],
+    &emsp;δ(W,o)=[X],
+    &emsp;δ(X,ε)=[Y],
+    &emsp;δ(Y,n)=[Z],
+    &emsp;δ(Z,ε)=[AA],
+    &emsp;δ(AA,ε)=[AB],
+    &emsp;δ(AB,M)=[AC],
+    &emsp;δ(AC,ε)=[AD],
+    &emsp;δ(AD,y)=[AE],
+    &emsp;δ(AE,ε)=[AF],
+    &emsp;δ(AF,S)=[AG],
+    &emsp;δ(AG,ε)=[AH],
+    &emsp;δ(AH,Q)=[AI],
+    &emsp;δ(AI,ε)=[AJ],
+    &emsp;δ(AJ,L)=[AK],
+    &emsp;δ(AK,ε)=[F, AL],
+    &emsp;δ(AL,ε)=[AM],
+    &emsp;δ(AM,ε)=[AN, AZ],
+    &emsp;δ(AN,ε)=[AO],
+    &emsp;δ(AO,H)=[AP],
+    &emsp;δ(AP,ε)=[AQ],
+    &emsp;δ(AQ,u)=[AR],
+    &emsp;δ(AR,ε)=[AS],
+    &emsp;δ(AS,a)=[AT],
+    &emsp;δ(AT,ε)=[AU],
+    &emsp;δ(AU,n)=[AV],
+    &emsp;δ(AV,ε)=[AW],
+    &emsp;δ(AW,g)=[AX],
+    &emsp;δ(AX,ε)=[AO, AY],
+    &emsp;δ(AY,ε)=[BH],
+    &emsp;δ(AZ,ε)=[BA],
+    &emsp;δ(BA,W)=[BB],
+    &emsp;δ(BB,ε)=[BC],
+    &emsp;δ(BC,e)=[BD],
+    &emsp;δ(BD,ε)=[BE],
+    &emsp;δ(BE,i)=[BF],
+    &emsp;δ(BF,ε)=[BA, BG],
+    &emsp;δ(BG,ε)=[BH],
+};
+S={A};
+Z={BH}
+```mermaid
+graph TB
+
+AX-->|ε|AY
+AX-->|ε|AO
+X-->|ε|Y
+Z-->|ε|AA
+AV-->|ε|AW
+AT-->|ε|AU
+AQ-->|u|AR
+AR-->|ε|AS
+AP-->|ε|AQ
+AU-->|n|AV
+AN-->|ε|AO
+AL-->|ε|AM
+AW-->|g|AX
+AS-->|a|AT
+E-->|ε|F
+E-->|ε|AL
+BG-->|ε|BH
+AH-->|Q|AI
+AF-->|S|AG
+AJ-->|L|AK
+A-->|G|B
+AZ-->|ε|BA
+AB-->|M|AC
+BE-->|i|BF
+G-->|J|H
+BC-->|e|BD
+AM-->|ε|AZ
+AM-->|ε|AN
+AK-->|ε|F
+AK-->|ε|AL
+AI-->|ε|AJ
+AG-->|ε|AH
+AD-->|y|AE
+AE-->|ε|AF
+O-->|P|P
+AC-->|ε|AD
+AA-->|ε|AB
+BA-->|W|BB
+I-->|a|J
+M-->|a|N
+C-->|o|D
+B-->|ε|C
+D-->|ε|E
+F-->|ε|G
+F-->|ε|O
+H-->|ε|I
+U-->|h|V
+J-->|ε|K
+BF-->|ε|BG
+BF-->|ε|BA
+K-->|v|L
+L-->|ε|M
+BD-->|ε|BE
+BB-->|ε|BC
+N-->|ε|AA
+AO-->|H|AP
+W-->|o|X
+P-->|ε|Q
+S-->|t|T
+Y-->|n|Z
+R-->|ε|S
+Q-->|y|R
+T-->|ε|U
+AY-->|ε|BH
+V-->|ε|W
+```
