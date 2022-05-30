@@ -20,7 +20,7 @@ public class GrammarTree {
         displayLeaf(root);
     }
 
-    private GrammarTree(Grammar grammar,String Path){
+    public GrammarTree(Grammar grammar,String Path){
         Map<String, Set<String>> productions = grammar.getProduction();
         Map<String,Set<String>> map = grammar.getProduction();
         root = getSubTree(grammar.getStart(),map,grammar.getVN());
