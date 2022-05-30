@@ -1,11 +1,5 @@
 package Grammar;
 
-<<<<<<< HEAD
-=======
-import ThompsonBuildNFA.Pair;
-import com.sun.source.util.Trees;
-
->>>>>>> a5f9ef84c40b601659c6e3393520fce9e0b30b5c
 import java.io.*;
 import java.util.*;
 
@@ -13,11 +7,7 @@ public class Grammar {
     private String start;
     private Set<String> VT;
     private Set<String> VN;
-<<<<<<< HEAD
     private Map<String,Set<String>> production;
-=======
-    private Map<String,Set<List<String>>> production;
->>>>>>> a5f9ef84c40b601659c6e3393520fce9e0b30b5c
 
     public Grammar(){
         start = null;
@@ -67,7 +57,6 @@ public class Grammar {
                 }
             }
         }
-<<<<<<< HEAD
         for(String s:VT){
             if(!production.containsKey(s)) production.put(s,new HashSet<>());
         }
@@ -81,36 +70,6 @@ public class Grammar {
         }
         if(production.containsKey(left)) production.get(left).add(right);
         else production.put(left,new HashSet<>(){{add(right);}});
-=======
-    }
-
-    public void addProduction(String left,String right) {
-        StringBuilder str = new StringBuilder(left + right);
-        List<String> list = new LinkedList<>();
-        char[] chars = str.toString().toCharArray();
-        for(int i = 0;i < chars.length;){
-            char c = chars[i];
-            int j = getNext(chars,i);
-            String s = str.substring(i,j);
-            if(i >= left.length()) list.add(s);
-            if(c >= 'A' && c <= 'Z') VN.add(s);
-            else VT.add(s);
-            i = j;
-        }
-        if(production.containsKey(left)){
-            production.get(left).add(list);
-        }else{
-            production.put(left,new HashSet<>(){{add(list);}});
-        }
-    }
-
-    public int getNext(char[] chars,int index){
-        int len = chars.length;
-        int j = index;
-        while(++j < len)
-            if(chars[j] != '`') break;
-        return j;
->>>>>>> a5f9ef84c40b601659c6e3393520fce9e0b30b5c
     }
 
     public String getStart() {
@@ -137,11 +96,7 @@ public class Grammar {
         this.VN = VN;
     }
 
-<<<<<<< HEAD
     public Map<String, Set<String>> getProduction() {
-=======
-    public Map<String, Set<List<String>>> getProduction() {
->>>>>>> a5f9ef84c40b601659c6e3393520fce9e0b30b5c
         return production;
     }
 
