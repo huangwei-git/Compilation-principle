@@ -1,6 +1,14 @@
 G(E):
+<<<<<<< HEAD
     E -> TA
     A -> +TA
     T -> FB
     B ->*FB
     F->(E)
+=======
+    E -> TE`
+    E` -> +TE` | ε
+    T -> FT`
+    T`->*FT`|ε
+    F->(E) |i
+>>>>>>> a5f9ef84c40b601659c6e3393520fce9e0b30b5c
