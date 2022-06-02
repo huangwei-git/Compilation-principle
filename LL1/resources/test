@@ -1,12 +1,6 @@
 G(S):
-    S->ABCDH
-    A->Cab
+    S->ABCD
+    A->aA
+    B->AB
+    B->b
     D->d
-    B->ACMC
-    C->CcA
-    C->fAce
-    M->m
-    A->a
-    F->GCD
-    G->g
-    H->abFCd

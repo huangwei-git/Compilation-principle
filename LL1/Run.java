@@ -1,10 +1,9 @@
 package LL1;
 
 import Grammar.Grammar;
+import LL1.SyntaxTree.GrammarTree;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Run {
     public static void main(String[] args) {
