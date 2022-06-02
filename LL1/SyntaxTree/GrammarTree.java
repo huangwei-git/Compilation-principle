@@ -5,7 +5,10 @@ import Grammar.Grammar;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class GrammarTree {
     GrammarTreeNode root;
