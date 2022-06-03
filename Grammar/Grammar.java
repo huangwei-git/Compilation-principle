@@ -8,6 +8,7 @@ public class Grammar {
     private Set<String> VT;
     private Set<String> VN;
     private Map<String,Set<String>> production;
+    private FileReader fr;
 
     public Grammar(){
         start = null;
@@ -32,6 +33,7 @@ public class Grammar {
             while(!(str.append(br.readLine())).toString().equals("null")){
                 if(start == null){
                     int pos = str.indexOf("(") + 1;
+                    if(pos == 0) pos = str.indexOf("[") + 1;
                     start = str.substring(pos,pos + 1);
                 }else{
                     int pos = str.indexOf("->");
