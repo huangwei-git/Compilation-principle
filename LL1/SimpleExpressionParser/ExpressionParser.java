@@ -1,43 +1,33 @@
 package LL1.SimpleExpressionParser;
 
-import Grammar.Grammar;
-import LL1.FIRSTandFOLLOW;
-import LL1.SyntaxTree.GrammarTreeNode;
-
 import java.io.*;
-import java.security.DrbgParameters;
-import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.List;
 
-public class ExpresstionParser {
-    private char lookAHead;
-    private CharArrayReader expressionReader;
-    private GrammarTreeNode root;
+// E' -> Q
+// T' -> W
 
-    public ExpresstionParser(String s,int i) {
-        String expression = s.replaceAll("(\\r\\n|\\n|\\\\n|\\s)", "");
-        expressionReader = new CharArrayReader(expression.toCharArray());
-    }
+public class ExpressionParser {
+    private char lookAHead;// 当前指向的字符
+    private CharArrayReader expressionReader;// 读取表达式的字符流
+    private Node root;// 表达式解析树根结点
 
-    public ExpresstionParser(String fileName) {
-        FileInputStream fis = null;
+    public ExpressionParser(String fileName) {
         try {
-            fis = new FileInputStream(new File(fileName));
-            String expression = new String(fis.readAllBytes());
+            // 读取文件，获得表达式
+            String expression = new String(new FileInputStream(new File(fileName)).readAllBytes());
+            // 消除whilespaces
             expression = expression.replaceAll("(\\r\\n|\\n|\\\\n|\\s)", "");
+            // 将表达式的char[]数组作为参数构造CharArrayReader
             expressionReader = new CharArrayReader(expression.toCharArray());
+            // 调用pares解析表达式
+            parse();
+            // 先序遍历表达式解析树
+            root.preOrder();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            // 关闭文件输入流fis
-            if(fis != null){
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
@@ -54,24 +44,14 @@ public class ExpresstionParser {
         return next;
     }
 
-    public void parse(){
+    // 从文法的起始符开始解析表达式
+    private void parse(){
         getNextToken();
         root = E();
     }
 
-    public void preorder(GrammarTreeNode node){
-        if(node != null){
-            System.out.print(node.value);
-            if(node.childs.size() > 0) System.out.print("(");
-            for(GrammarTreeNode child : node.childs){
-                preorder(child);
-            }
-            if(node.childs.size() > 0) System.out.print(")");
-        }
-    }
-
-    private GrammarTreeNode E(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("E");
+    private Node E(){
+        Node currentNode = new Node("E");
         //E -> TQ
         // E: [(, i]
         if(lookAHead == '(' || lookAHead == 'i'){
@@ -89,8 +69,8 @@ public class ExpresstionParser {
         return currentNode;
     }
 
-    private GrammarTreeNode Q(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("Q");
+    private Node Q(){
+        Node currentNode = new Node("Q");
         // Q -> ATQ
         if(lookAHead == '(' || lookAHead == 'i' || lookAHead == '+' || lookAHead == '-'){
             currentNode.childs.add(A());
@@ -100,8 +80,8 @@ public class ExpresstionParser {
         return currentNode;
     }
 
-    private GrammarTreeNode T(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("T");
+    private Node T(){
+        Node currentNode = new Node("T");
         // T->FW
         // T: [(, i]
         if(lookAHead == '(' || lookAHead == 'i'){
@@ -119,8 +99,8 @@ public class ExpresstionParser {
         return currentNode;
     }
 
-    private GrammarTreeNode W(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("W");
+    private Node W(){
+        Node currentNode = new Node("W");
         // W->MFW
         if(lookAHead == '(' || lookAHead == 'i' || lookAHead == '*' || lookAHead == '/'){
             currentNode.childs.add(M());
@@ -130,16 +110,16 @@ public class ExpresstionParser {
         return currentNode;
     }
 
-    private GrammarTreeNode F(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("F");
+    private Node F(){
+        Node currentNode = new Node("F");
         //F->(E)
         if(lookAHead == '('){
-            currentNode.childs.add(new GrammarTreeNode("("));
+            currentNode.childs.add(new Node("("));
             getNextToken();
-            currentNode.childs.add(new GrammarTreeNode("E"));
+            currentNode.childs.add(new Node("E"));
             getNextToken();
             if(lookAHead == ')'){
-                currentNode.childs.add(new GrammarTreeNode(")"));
+                currentNode.childs.add(new Node(")"));
                 getNextToken();//???
             }else try { // exception
                 throw new ExpressionException("F->(E)");
@@ -149,7 +129,7 @@ public class ExpresstionParser {
         }
         // F -> i
         else if(lookAHead == 'i'){
-            currentNode.childs.add(new GrammarTreeNode("i"));
+            currentNode.childs.add(new Node("i"));
             getNextToken();
         }
         else{
@@ -163,16 +143,16 @@ public class ExpresstionParser {
         return currentNode;
     }
 
-    private GrammarTreeNode A(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("A");
+    private Node A(){
+        Node currentNode = new Node("A");
         // A -> +
         if(lookAHead == '+'){
-            currentNode.childs.add(new GrammarTreeNode("+"));
+            currentNode.childs.add(new Node("+"));
             getNextToken();
         }
         // A-> -
         else if(lookAHead == '-'){
-            currentNode.childs.add(new GrammarTreeNode("-"));
+            currentNode.childs.add(new Node("-"));
             getNextToken();
         }
         else{
@@ -186,16 +166,16 @@ public class ExpresstionParser {
         return currentNode;
     }
 
-    private GrammarTreeNode M(){
-        GrammarTreeNode currentNode = new GrammarTreeNode("F");
+    private Node M(){
+        Node currentNode = new Node("F");
         // M -> *
         if(lookAHead == '*'){
-            currentNode.childs.add(new GrammarTreeNode("*"));
+            currentNode.childs.add(new Node("*"));
             getNextToken();
         }
         // M -> /
         else if(lookAHead == '/'){
-            currentNode.childs.add(new GrammarTreeNode("/"));
+            currentNode.childs.add(new Node("/"));
             getNextToken();
         }
         else{
@@ -208,23 +188,35 @@ public class ExpresstionParser {
         }
         return currentNode;
     }
-
-    public char getLookAHead() {
-        return lookAHead;
-    }
-
-    public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-
-        ExpresstionParser expresstionParser = new ExpresstionParser("i+i*i",0);
-        expresstionParser.parse();
-        expresstionParser.preorder(expresstionParser.root);
-    }
 }
 
+// 解析错误异常类类
 class ExpressionException extends Throwable {
 
     public ExpressionException(String s){
         System.out.println("Production error : " + s);
+    }
+}
+
+// 表达式解析树结点类
+class Node{
+    public String value;
+    public List<Node> childs;
+
+    public Node(String value) {
+        this.value = value;
+        childs = new LinkedList<>();
+    }
+
+    // 先序遍历
+    public void preOrder(){
+        System.out.print(value);
+        if(childs.size() > 0){
+            System.out.print("(");
+            for(Node child : childs){
+                child.preOrder();
+            }
+            System.out.print(")");
+        }
     }
 }
