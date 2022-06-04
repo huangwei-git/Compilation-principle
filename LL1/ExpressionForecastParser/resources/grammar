@@ -1,13 +1,9 @@
 G[E]:
-T->FW
-W->¦Å
-A->-
-A->+
-M->*
-E->TQ
-F->i
-M->/
-Q->ATQ
-Q->¦Å
-W->MFW
-F->(E)
+    T->FW
+    W->¦Å
+    A->-|+
+    M->*|/
+    E->TQ
+    F->(E)|i
+    Q->ATQ|¦Å
+    W->MFW

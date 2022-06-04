@@ -76,6 +76,7 @@ public class FIRSTandFOLLOW {
         if(!followSet.containsKey(left)){
             followSet.put(left,new HashSet<>());
             if(left.equals(grammar.getStart())) set.add("#");
+            // 求FOLLOW(left),遍历右部包含left的所有产生式
             for(String production : map.get(left)){
                 int len = production.length();
                 char leftSYM = left.charAt(0);
@@ -140,7 +141,7 @@ public class FIRSTandFOLLOW {
     public String toString() {
         StringBuilder res = new StringBuilder();
         res.append(grammar.toString());
-        res.append("/n");
+        res.append("\n");
         res.append("FIRST:\n");
         for(String left : firstSet.keySet()){
             res.append(left + ": " + firstSet.get(left));
@@ -160,5 +161,10 @@ public class FIRSTandFOLLOW {
 
     public Map<String, Set<String>> getFollowSet() {
         return followSet;
+    }
+
+    public static void main(String[] args) {
+        FIRSTandFOLLOW firsTandFOLLOW = new FIRSTandFOLLOW(new Grammar(new File("src/LL1/ExpressionForecastParser/resources/grammar")));
+        System.out.println(firsTandFOLLOW);
     }
 }
